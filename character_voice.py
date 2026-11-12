@@ -20,7 +20,7 @@ from elevenlabs import ElevenLabs
 
 HERE = Path(__file__).parent
 VOICES_FILE = HERE / "characters.json"   # character name -> {voice_id, description}
-OUT_DIR = HERE / "output"
+OUT_DIR = HERE / "mp3_output"
 
 DESIGN_MODEL = "eleven_multilingual_ttv_v2"
 TTS_MODEL = "eleven_multilingual_v2"
