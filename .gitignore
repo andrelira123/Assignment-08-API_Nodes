@@ -1,3 +1,4 @@
 .env.local
 keys/
 Tutorials/
+.DS_Store
