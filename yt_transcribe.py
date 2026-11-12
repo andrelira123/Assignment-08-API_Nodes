@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
 
 MODEL_ID = "scribe_v2"
+TRANSCRIPTS_DIR = Path(__file__).parent / "transcripts"
 
 
 def download_audio(url: str, out_dir: Path):
@@ -87,7 +88,7 @@ def main():
     parser.add_argument("url", nargs="?", help="YouTube video URL")
     parser.add_argument("--diarize", action="store_true", help="Label speakers with timestamps")
     parser.add_argument("--language", help="Language code, e.g. eng, spa (default: auto)")
-    parser.add_argument("--out", help="Output .txt path (default: <video title>.txt)")
+    parser.add_argument("--out", help="Output filename (saved in transcripts/) or a full path")
     parser.add_argument("--keep-audio", action="store_true", help="Keep the downloaded audio file")
     args = parser.parse_args()
 
@@ -121,7 +122,16 @@ def main():
 
         body = format_diarized(result) if args.diarize else result.text.strip()
 
-        out_path = Path(args.out) if args.out else Path(f"{safe_filename(title)}.txt")
+        TRANSCRIPTS_DIR.mkdir(exist_ok=True)
+        if args.out:
+            out_path = Path(args.out)
+            # A bare filename like "interview.txt" goes into transcripts/;
+            # a full path like ~/Desktop/x.txt or ./notes/x.txt is respected as-is.
+            if out_path.parent == Path("."):
+                out_path = TRANSCRIPTS_DIR / out_path
+        else:
+            out_path = TRANSCRIPTS_DIR / f"{safe_filename(title)}.txt"        
+        
         header = (
             f"Title: {title}\n"
             f"URL: {info.get('webpage_url', url)}\n"
